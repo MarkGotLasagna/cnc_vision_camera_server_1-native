@@ -47,7 +47,8 @@ jobs:
           sudo apt-get install -y \
             lcov gcovr cmake build-essential \
             libcamera-dev pkg-config \
-            ninja-build
+            ninja-build \
+            libcamera-dev
 
       - name: Configure CMake with coverage
         run: |
