@@ -1,0 +1,15 @@
+# Ignore VS Code workspace settings (unreccommended)
+# Do this if you don't want VS Code automation
+# .vscode/
+
+# Ignore build directories
+build/
+
+# Ignore sysroot files
+sysroot/
+
+# Ignore externals
+externals/
+
+# Ignore backup files
+*.bkp
