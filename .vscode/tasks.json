@@ -2,11 +2,67 @@
     "version": "2.0.0",
     "tasks": [
         {
+            "label": "configure",
+            "type": "shell",
+            "command": "cmake",
+            "args": [
+                "-B", "build",
+                "-DCMAKE_BUILD_TYPE=Debug",
+                "-DENABLE_COVERAGE=ON",
+                "-DENABLE_TESTING=ON"
+            ],
+            "group": "build",
+            "problemMatcher": "$gcc",
+            "options": {
+                "cwd": "${workspaceFolder}"
+            }
+        },
+        {
+            "label": "build",
+            "type": "shell",
+            "command": "cmake",
+            "args": ["--build", "build", "--parallel"],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "dependsOn": "configure",
+            "problemMatcher": "$gcc",
+            "options": {
+                "cwd": "${workspaceFolder}"
+            }
+        },
+        {
+            "label": "test",
+            "type": "shell",
+            "command": "ctest",
+            "args": ["--output-on-failure"],
+            "group": "test",
+            "dependsOn": "build",
+            "options": {
+                "cwd": "${workspaceFolder}/build"
+            }
+        },
+        {
             "label": "Coverage Report",
             "type": "shell",
             "command": "cmake",
             "args": ["--build", "build", "--target", "coverage"],
-            "group": "test"
+            "group": "test",
+            "dependsOn": "build",
+            "options": {
+                "cwd": "${workspaceFolder}"
+            }
+        },
+        {
+            "label": "clean",
+            "type": "shell",
+            "command": "cmake",
+            "args": ["--build", "build", "--target", "clean"],
+            "group": "build",
+            "options": {
+                "cwd": "${workspaceFolder}"
+            }
         }
     ]
 }

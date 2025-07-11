@@ -45,6 +45,38 @@ target_include_directories(${PROJECT_NAME}
 # target_link_libraries(${PROJECT_NAME} pthread)
 
 option(ENABLE_COVERAGE "Enable coverage reporting" OFF)
+option(ENABLE_TESTING "Enable unit testing" OFF)
+
+# Find libcamera
+find_package(PkgConfig REQUIRED)
+pkg_check_modules(LIBCAMERA REQUIRED libcamera)
+
+if(LIBCAMERA_FOUND)
+    message(STATUS "Found libcamera: ${LIBCAMERA_VERSION}")
+    target_include_directories(${PROJECT_NAME} PRIVATE ${LIBCAMERA_INCLUDE_DIRS})
+    target_link_libraries(${PROJECT_NAME} ${LIBCAMERA_LIBRARIES})
+    target_compile_options(${PROJECT_NAME} PRIVATE ${LIBCAMERA_CFLAGS_OTHER})
+else()
+    message(WARNING "libcamera not found - some features may not work")
+endif()
+
+# Enable testing if requested
+if(ENABLE_TESTING)
+    enable_testing()
+    
+    # Add a simple test
+    add_test(
+        NAME basic_run_test
+        COMMAND ${PROJECT_NAME}
+        WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+    )
+    
+    # Set test properties
+    set_tests_properties(basic_run_test PROPERTIES
+        PASS_REGULAR_EXPRESSION "Hello, World!"
+        TIMEOUT 10
+    )
+endif()
 
 if(ENABLE_COVERAGE)
     if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")

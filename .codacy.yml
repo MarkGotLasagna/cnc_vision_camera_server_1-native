@@ -1,8 +1,16 @@
 engines:
   clang-tidy:
     enabled: true
+    checks:
+      - "readability-*"
+      - "modernize-*"
+      - "performance-*"
+      - "bugprone-*"
+      - "cppcoreguidelines-*"
+      - "-modernize-use-trailing-return-type"
   cppcheck:
     enabled: true
+    std: ["c11", "c++17"]
   coverage:
     enabled: true
   duplication:
@@ -11,11 +19,20 @@ engines:
       languages:
         - cpp
         - c
+      minimum_tokens: 50
+
+quality_settings:
+  min_coverage: 80
+  duplication_threshold: 10
 
 exclude_paths:
   - "build/**"
   - "coverage_html/**"
   - "docs/**"
   - "cmake/**"
+  - "externals/**"
+  - "sysroot/**"
   - "*.ps1"
   - "*.md"
+  - ".github/**"
+  - ".vscode/**"
