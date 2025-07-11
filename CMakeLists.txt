@@ -9,7 +9,7 @@
 ##################################################################
 
 cmake_minimum_required(VERSION 3.16)
-project(cnc_vision_camera_server_1)
+project(cnc_vision_camera_server_1-native)
 
 # Set C++ and C standards
 set(CMAKE_CXX_STANDARD 17)
