@@ -23,7 +23,7 @@
 if (-not ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole(`
     [Security.Principal.WindowsBuiltInRole] "Administrator")) {
 
-    Write-Host "This script requires admin privileges.`nContinue? (Y/N)" -ForegroundColor Yellow
+    Write-Output "This script requires admin privileges.`nContinue? (Y/N)"
 
     $confirmation = Read-Host
     if ($confirmation -eq 'Y') {
@@ -40,18 +40,18 @@ if (Test-Path $saveFile) {
     $toml = Get-Content $saveFile -Raw
     if ($toml -match "adapter\s*=\s*'([^']+)'") {
         $adapterName = $matches[1]
-        Write-Host "Using previously selected adapter: $adapterName"
+        Write-Output "Using previously selected adapter: $adapterName"
     } else {
-        Write-Host "Failed to parse adapter name from config." -ForegroundColor Red
+        Write-Output "Failed to parse adapter name from config."
         Remove-Item $saveFile
         exit
     }
 } else {
     # List adapters and select one
     $adapters = Get-NetAdapter | Where-Object { $_.Status -eq 'Up' } 
-    Write-Host "Available network adapters:`n"
+    Write-Output "Available network adapters:`n"
     for ($i = 0; $i -lt $adapters.Count; $i++) {
-        Write-Host "$i) $($adapters[$i].Name) - $($adapters[$i].InterfaceDescription)"
+        Write-Output "$i) $($adapters[$i].Name) - $($adapters[$i].InterfaceDescription)"
     }
     $selection = Read-Host "`nEnter the number of the adapter to select"
     if ($selection -match '^\d+$' -and $selection -lt $adapters.Count) {
@@ -61,7 +61,7 @@ if (Test-Path $saveFile) {
 adapter = '$adapterName'
 "@ | Out-File -Encoding utf8 $saveFile
     } else {
-        Write-Host "Invalid selection." -ForegroundColor Red
+        Write-Output "Invalid selection." -ForegroundColor Red
         exit
     }
 }
@@ -82,7 +82,7 @@ $prefixLength = Convert-SubnetToPrefix $subnetMask
 
 ### APPLY STATIC IP SETTINGS
 try {
-    Write-Host "`nApplying static IP configuration..." -ForegroundColor Cyan
+    Write-Output "`nApplying static IP configuration..."
 
     Set-NetIPInterface -InterfaceAlias $adapterName -Dhcp Disabled # Disable DHCP
 
@@ -99,8 +99,8 @@ try {
     # This is done by default from the Pi4's DHCP server config
     # Set-DnsClientServerAddress -InterfaceAlias $adapterName -ServerAddresses ("8.8.8.8", "1.1.1.1")
 
-    Write-Host "`n IP configuration applied successfully to '$adapterName'" -ForegroundColor Green
-    Write-Host "   IP: $ipAddress/$prefixLength"
+    Write-Output "`n IP configuration applied successfully to '$adapterName'"
+    Write-Output "   IP: $ipAddress/$prefixLength"
 } catch {
-    Write-Host "Failed to apply IP settings: $_" -ForegroundColor Red
+    Write-Output "Failed to apply IP settings: $_" -ForegroundColor Red
 }
