@@ -1,0 +1,12 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Coverage Report",
+            "type": "shell",
+            "command": "cmake",
+            "args": ["--build", "build", "--target", "coverage"],
+            "group": "test"
+        }
+    ]
+}

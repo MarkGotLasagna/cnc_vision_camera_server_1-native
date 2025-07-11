@@ -13,3 +13,12 @@ externals/
 
 # Ignore backup files
 *.bkp
+
+# Coverage reports
+coverage.info
+coverage.xml
+coverage_html/
+
+# Object files
+*.gcda
+*.gcno

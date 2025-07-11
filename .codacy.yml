@@ -1,0 +1,21 @@
+engines:
+  clang-tidy:
+    enabled: true
+  cppcheck:
+    enabled: true
+  coverage:
+    enabled: true
+  duplication:
+    enabled: true
+    config:
+      languages:
+        - cpp
+        - c
+
+exclude_paths:
+  - "build/**"
+  - "coverage_html/**"
+  - "docs/**"
+  - "cmake/**"
+  - "*.ps1"
+  - "*.md"

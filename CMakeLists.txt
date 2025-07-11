@@ -44,5 +44,65 @@ target_include_directories(${PROJECT_NAME}
 # Uncomment as needed
 # target_link_libraries(${PROJECT_NAME} pthread)
 
+option(ENABLE_COVERAGE "Enable coverage reporting" OFF)
+
+if(ENABLE_COVERAGE)
+    if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
+        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} --coverage -g -O0")
+        set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} --coverage -g -O0")
+        set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} --coverage")
+    endif()
+endif()
+
+if(ENABLE_COVERAGE)
+    # Find required coverage tools
+    find_program(LCOV_PATH lcov)
+    find_program(GENHTML_PATH genhtml)
+    find_program(GCOVR_PATH gcovr)
+    
+    if(NOT LCOV_PATH OR NOT GENHTML_PATH)
+        message(WARNING "lcov or genhtml not found! Coverage target will not work.")
+    endif()
+    
+    if(NOT GCOVR_PATH)
+        message(WARNING "gcovr not found! XML coverage report will not be generated.")
+    endif()
+
+    # Add coverage target
+    add_custom_target(coverage
+        # Clean previous coverage data
+        COMMAND ${CMAKE_COMMAND} -E remove -f coverage.info coverage.xml
+        COMMAND find ${CMAKE_BINARY_DIR} -name "*.gcda" -delete
+        
+        # Run the executable first to generate .gcda files
+        COMMAND ${CMAKE_BINARY_DIR}/${PROJECT_NAME}
+        
+        # Generate lcov coverage data
+        COMMAND ${LCOV_PATH} --directory ${CMAKE_BINARY_DIR} --capture --output-file coverage.info
+        COMMAND ${LCOV_PATH} --remove coverage.info '/usr/*' '*/build/*' --output-file coverage.info
+        
+        # Generate HTML report
+        COMMAND ${GENHTML_PATH} coverage.info --output-directory coverage_html
+        
+        # Generate XML report for Codacy
+        COMMAND ${GCOVR_PATH} --xml --output coverage.xml ${CMAKE_BINARY_DIR}
+        
+        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+        DEPENDS ${PROJECT_NAME}
+        COMMENT "Generating coverage reports (HTML and XML)"
+    )
+    
+    # Add a separate target for just XML coverage (useful for CI)
+    add_custom_target(coverage-xml
+        COMMAND ${CMAKE_COMMAND} -E remove -f coverage.xml
+        COMMAND find ${CMAKE_BINARY_DIR} -name "*.gcda" -delete
+        COMMAND ${CMAKE_BINARY_DIR}/${PROJECT_NAME}
+        COMMAND ${GCOVR_PATH} --xml --output coverage.xml ${CMAKE_BINARY_DIR}
+        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+        DEPENDS ${PROJECT_NAME}
+        COMMENT "Generating XML coverage report for Codacy"
+    )
+endif()
+
 # Install target
 install(TARGETS ${PROJECT_NAME} DESTINATION bin)
