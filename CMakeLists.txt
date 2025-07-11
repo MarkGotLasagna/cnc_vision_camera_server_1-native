@@ -73,7 +73,7 @@ if(ENABLE_TESTING)
     
     # Set test properties
     set_tests_properties(basic_run_test PROPERTIES
-        PASS_REGULAR_EXPRESSION "Hello, World!"
+        PASS_REGULAR_EXPRESSION "Hello, Camera Server!"
         TIMEOUT 10
     )
 endif()
